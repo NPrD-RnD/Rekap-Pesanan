@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rekap Pesanan Mama</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--ink:#202437;--muted:#687086;--line:#e6e8ef;--accent:#7b4ce2;--accent2:#6236c5;--green:#17865d;--red:#c53d4c;--soft:#f0eaff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(120deg,#7043d1,#9b76ed);color:white;padding:28px 18px 34px}
+.head{max-width:1120px;margin:auto}h1{margin:0 0 6px;font-size:clamp(24px,4vw,34px)}header p{margin:0;color:#f1eaff}
+main{max-width:1120px;margin:-18px auto 40px;padding:0 16px}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.stat,.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 4px 18px #1e25400a}
+.stat span{display:block;color:var(--muted);font-size:13px;margin-bottom:5px}.stat strong{font-size:clamp(19px,3vw,27px);overflow-wrap:anywhere}
+.layout{display:grid;grid-template-columns: minmax(280px,.85fr) minmax(0,1.5fr);gap:16px;align-items:start}
+h2{font-size:18px;margin:0 0 14px}h3{font-size:15px;margin:0 0 10px}
+label{display:block;font-size:13px;font-weight:650;margin:12px 0 6px;color:#42485b}
+input,select{font:inherit;color:inherit;width:100%;border:1px solid #d9dce7;border-radius:10px;padding:11px 12px;background:#fff;min-width:0}
+input:focus,select:focus{outline:2px solid #d8c9ff;border-color:var(--accent)}
+button{font:inherit;font-weight:650;border:0;border-radius:10px;padding:10px 13px;cursor:pointer;transition:.15s}
+button:focus-visible{outline:3px solid #bca6ff;outline-offset:2px}
+.primary{background:var(--accent);color:#fff}.primary:hover{background:var(--accent2)}.secondary{background:var(--soft);color:#5e37b5}.neutral{background:#f0f1f6;color:#42485b}.danger{background:#fff0f1;color:var(--red)}.small{padding:6px 9px;font-size:12px}
+.row{display:flex;gap:8px;align-items:end}.row>*{flex:1}.hint{font-size:12px;color:var(--muted);margin-top:7px}
+.divider{height:1px;background:var(--line);margin:17px 0}
+.customer-list{display:grid;gap:12px}.customer{border:1px solid var(--line);border-radius:14px;padding:15px}.customer-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.customer-name{font-size:17px;font-weight:750;overflow-wrap:anywhere}.subtle{font-size:12px;color:var(--muted)}
+.items{margin:12px 0 0;padding:0;list-style:none}.items li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid #f0f1f5}.item-left{min-width:0}.item-name{font-weight:600}.item-detail{font-size:12px;color:var(--muted)}.item-right{text-align:right;white-space:nowrap}.item-right strong{display:block;font-size:14px}
+.customer-total{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#f8f6ff;border-radius:10px;padding:11px 12px;margin-top:12px}.customer-total strong{font-size:17px}
+.empty{border:1px dashed #d7d9e5;border-radius:12px;padding:24px 14px;text-align:center;color:var(--muted)}
+.section-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}.section-head h2{margin:0}
+.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:10px 9px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--muted);font-weight:650;background:#fafaff}td.num,th.num{text-align:right;white-space:nowrap}
+.total-bar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:14px;padding:14px;background:#f0eaff;border-radius:12px}.total-bar strong{font-size:20px;color:#5831b2}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.toolbar button{flex:1}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#242438;color:#fff;padding:10px 15px;border-radius:10px;box-shadow:0 6px 24px #0002;display:none;z-index:5;max-width:90%;text-align:center}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:0 15px 24px}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.stats{gap:8px}.stat{padding:13px}.stat span{font-size:11px}.stat strong{font-size:19px}main{padding:0 11px}.panel{padding:15px}.toolbar button{flex:1 1 42%}}
+@media print{.customer-details[hidden]{display:block!important}body{background:#fff;font-size:12px}header{background:#fff!important;color:#111;padding:0 0 15px}header p{color:#555}main{margin:0;max-width:none;padding:0}.layout{display:block}.panel,.stat{box-shadow:none;border:1px solid #ddd;break-inside:avoid}.entry-panel,.toolbar,.no-print,.danger,.small{display:none!important}.stats{grid-template-columns:repeat(3,1fr)}.customer-list{grid-template-columns:repeat(2,1fr)}.customer{break-inside:avoid}.section-head{margin-top:18px}footer{padding-top:15px}}
+</style>
+</head>
+<body>
+<header><div class="head"><h1>🍱 Rekap Pesanan Mama</h1><p>Catat pesanan pembeli, pantau jumlah menu, dan hitung pendapatan otomatis.</p></div></header>
+<main>
+  <section class="stats" aria-label="Ringkasan">
+    <div class="stat"><span>Total Pembeli</span><strong id="statBuyers">0</strong></div>
+    <div class="stat"><span>Total Item Dipesan</span><strong id="statItems">0</strong></div>
+    <div class="stat"><span>Total Pendapatan</span><strong id="statRevenue">Rp0</strong></div>
+  </section>
+
+  <div class="layout">
+    <section class="panel entry-panel">
+      <h2>Tambah pembeli</h2>
+      <form id="buyerForm">
+        <label for="buyerName">Nama pembeli</label>
+        <input id="buyerName" maxlength="100" placeholder="Contoh: Bu Rina" required>
+        <button class="primary" style="width:100%;margin-top:12px" type="submit">+ Tambah Pembeli</button>
+      </form>
+      <div class="divider"></div>
+      <h2>Tambah pesanan</h2>
+      <form id="orderForm">
+        <label for="buyerSelect">Pilih pembeli</label>
+        <select id="buyerSelect" required><option value="">Tambahkan pembeli dahulu</option></select>
+        <label for="menuSelect">Menu</label>
+        <select id="menuSelect" required>
+          <option value="kb_daun">Kremesan Besar — Daun Jeruk</option>
+          <option value="kb_ori">Kremesan Besar — Original</option>
+          <option value="kb_tempe">Kremesan Besar — Tempe</option>
+          <option value="kk_daun">Kremesan Kecil — Daun Jeruk</option>
+          <option value="kk_ori">Kremesan Kecil — Original</option>
+          <option value="kk_tempe">Kremesan Kecil — Tempe</option>
+          <option value="ayam">Paket Ayam</option>
+          <option value="ayam_paha_only">Paket Ayam (Paha only)</option>
+          <option value="ayam_dada_only">Paket Ayam (Dada only)</option>
+          <option value="cumi">Tumis Cumi</option>
+        </select>
+        <div class="row">
+          <div><label for="qtyInput">Jumlah</label><input id="qtyInput" type="number" min="1" max="9999" step="1" value="1" required></div>
+          <div><label>Harga satuan</label><input id="pricePreview" value="Rp30.000" readonly aria-label="Harga satuan"></div>
+        </div>
+        <button class="primary" type="submit" style="width:100%;margin-top:13px">+ Masukkan Pesanan</button>
+        <div class="hint">Jika pembeli memesan menu yang sama lagi, jumlahnya akan digabung otomatis.</div>
+      </form>
+      <div class="divider"></div>
+      <h3>Daftar harga</h3>
+      <div class="subtle">Kremesan besar: Rp30.000 · Kremesan kecil: Rp20.000<br>Paket ayam: Rp70.000 · Paket ayam paha only: Rp75.000 · Paket ayam dada only: Rp75.000<br>Tumis cumi: Rp55.000</div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head"><h2>Rekap per pembeli</h2><span class="subtle" id="buyerCountLabel">0 pembeli</span></div>
+      <div class="toolbar no-print" style="margin:0 0 12px"><button class="secondary" id="collapseAllBtn" type="button">Ringkas semua</button><button class="neutral" id="expandAllBtn" type="button">Lihat semua rincian</button></div>
+      <div id="customers" class="customer-list"><div class="empty">Belum ada pembeli. Tambahkan nama pembeli di sebelah kiri.</div></div>
+      <div class="toolbar no-print">
+        <button class="secondary" id="exportCsvBtn" type="button">Unduh CSV</button>
+        <button class="neutral" id="printBtn" type="button">Cetak / PDF</button>
+        <button class="danger" id="clearBtn" type="button">Hapus Semua Data</button>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel" style="margin-top:16px">
+    <div class="section-head"><h2>Rekap total semua pesanan</h2><span class="subtle">Gabungan seluruh pembeli</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Menu</th><th class="num">Harga</th><th class="num">Jumlah</th><th class="num">Total</th></tr></thead>
+        <tbody id="summaryBody"><tr><td colspan="4" style="text-align:center;color:#687086">Belum ada pesanan.</td></tr></tbody>
+      </table>
+    </div>
+    <div class="total-bar"><div><div class="subtle">Total pendapatan semua pesanan</div><strong id="grandTotal">Rp0</strong></div><div style="text-align:right"><div class="subtle">Jumlah seluruh item</div><strong id="grandQty">0</strong></div></div>
+  </section>
+</main>
+<footer>Data disimpan di browser perangkat ini. Ekspor CSV secara berkala sebagai cadangan.</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+'use strict';
+const MENU = [
+  {id:'kb_daun',name:'Kremesan Besar — Daun Jeruk',price:30000},
+  {id:'kb_ori',name:'Kremesan Besar — Original',price:30000},
+  {id:'kb_tempe',name:'Kremesan Besar — Tempe',price:30000},
+  {id:'kk_daun',name:'Kremesan Kecil — Daun Jeruk',price:20000},
+  {id:'kk_ori',name:'Kremesan Kecil — Original',price:20000},
+  {id:'kk_tempe',name:'Kremesan Kecil — Tempe',price:20000},
+  {id:'ayam',name:'Paket Ayam',price:70000},
+  {id:'ayam_paha_only',name:'Paket Ayam (Paha only)',price:75000},
+  {id:'ayam_dada_only',name:'Paket Ayam (Dada only)',price:75000},
+  {id:'ayam_paha',name:'Paket Ayam (Paha/Dada — pesanan lama, belum dipisah)',price:75000,legacy:true},
+  {id:'cumi',name:'Tumis Cumi',price:55000}
+];
+const $ = id => document.getElementById(id);
+const rupiah = n => 'Rp' + Math.round(n).toLocaleString('id-ID');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let customers = [];
+let toastTimer;
+const collapsedCustomers = new Set();
+function toast(message){const el=$('toast');el.textContent=message;el.style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display='none',2400)}
+function save(){try{localStorage.setItem('rekapPesananMama_v1',JSON.stringify(customers))}catch(e){toast('Penyimpanan browser penuh atau tidak tersedia. Silakan unduh CSV sebagai cadangan.')}}
+function load(){try{const raw=localStorage.getItem('rekapPesananMama_v1');if(raw){const parsed=JSON.parse(raw);if(Array.isArray(parsed))customers=parsed.filter(c=>c&&typeof c.id==='string'&&typeof c.name==='string'&&c.orders&&typeof c.orders==='object')}}catch(e){customers=[]}}
+function menuById(id){return MENU.find(m=>m.id===id)}
+function customerTotal(c){return Object.entries(c.orders).reduce((sum,[id,qty])=>sum+(menuById(id)?menuById(id).price*qty:0),0)}
+function customerQty(c){return Object.values(c.orders).reduce((sum,q)=>sum+(Number(q)||0),0)}
+function totals(){const qty={};MENU.forEach(m=>qty[m.id]=0);customers.forEach(c=>Object.entries(c.orders||{}).forEach(([id,q])=>{if(id in qty)qty[id]+=Number(q)||0}));return {qty,revenue:MENU.reduce((s,m)=>s+m.price*qty[m.id],0),count:MENU.reduce((s,m)=>s+qty[m.id],0)}}
+function render(){
+ const total=totals();
+ $('statBuyers').textContent=customers.length.toLocaleString('id-ID');
+ $('statItems').textContent=total.count.toLocaleString('id-ID');
+ $('statRevenue').textContent=rupiah(total.revenue);
+ $('buyerCountLabel').textContent=customers.length+' pembeli';
+ const select=$('buyerSelect'), previous=select.value;
+ select.innerHTML=customers.length?'<option value="">Pilih nama pembeli</option>'+customers.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join(''):'<option value="">Tambahkan pembeli dahulu</option>';
+ if(customers.some(c=>c.id===previous))select.value=previous;
+ const list=$('customers');
+ if(!customers.length){list.innerHTML='<div class="empty">Belum ada pembeli. Tambahkan nama pembeli di sebelah kiri.</div>'}
+ else {
+   list.innerHTML=customers.map(c=>{
+    const entries=Object.entries(c.orders).filter(([id,q])=>menuById(id)&&Number(q)>0);
+    const items=entries.length?`<ul class="items">${entries.map(([id,q])=>{const m=menuById(id);return `<li><div class="item-left"><div class="item-name">${esc(m.name)}</div><div class="item-detail">${Number(q)} × ${rupiah(m.price)}</div></div><div class="item-right"><strong>${rupiah(m.price*Number(q))}</strong><button class="danger small no-print" data-action="remove-item" data-customer="${esc(c.id)}" data-menu="${esc(id)}" type="button">Hapus</button></div></li>`}).join('')}</ul>`:'<div class="empty" style="margin-top:12px;padding:14px">Belum ada pesanan untuk pembeli ini.</div>';
+    return `<article class="customer"><div class="customer-top"><div><div class="customer-name">${esc(c.name)}</div><div class="subtle">${customerQty(c)} item dipesan</div></div><button class="danger small no-print" data-action="remove-customer" data-customer="${esc(c.id)}" type="button">Hapus pembeli</button></div><button class="secondary small no-print" style="margin-top:10px" data-action="toggle-details" data-customer="${esc(c.id)}" aria-expanded="${!collapsedCustomers.has(c.id)}" aria-controls="details-${esc(c.id)}" type="button">${collapsedCustomers.has(c.id)?'Lihat rincian':'Ringkas'}</button><div id="details-${esc(c.id)}" class="customer-details" ${collapsedCustomers.has(c.id)?'hidden':''}>${items}</div><div class="customer-total"><span>Total pembeli</span><strong>${rupiah(customerTotal(c))}</strong></div></article>`;
+   }).join('');
+ }
+ const body=$('summaryBody');
+ const hasOrders=total.count>0;
+ body.innerHTML=hasOrders?MENU.filter(m=>!m.legacy||total.qty[m.id]>0).map(m=>`<tr><td>${esc(m.name)}</td><td class="num">${rupiah(m.price)}</td><td class="num">${total.qty[m.id].toLocaleString('id-ID')}</td><td class="num">${rupiah(total.qty[m.id]*m.price)}</td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;color:#687086">Belum ada pesanan.</td></tr>';
+ $('grandTotal').textContent=rupiah(total.revenue);
+ $('grandQty').textContent=total.count.toLocaleString('id-ID');
+ updatePrice();
+}
+function updatePrice(){const m=menuById($('menuSelect').value);$('pricePreview').value=m?rupiah(m.price):'—'}
+$('menuSelect').addEventListener('change',updatePrice);
+$('buyerForm').addEventListener('submit',e=>{
+ e.preventDefault();const name=$('buyerName').value.trim();if(!name)return;
+ const c={id:(Date.now().toString(36)+Math.random().toString(36).slice(2,8)),name,orders:{}};
+ customers.push(c);save();render();$('buyerSelect').value=c.id;$('buyerName').value='';$('buyerName').focus();toast('Pembeli berhasil ditambahkan.');
+});
+$('orderForm').addEventListener('submit',e=>{
+ e.preventDefault();const c=customers.find(x=>x.id===$('buyerSelect').value);const m=menuById($('menuSelect').value);const qty=Number($('qtyInput').value);
+ if(!c){toast('Pilih atau tambahkan pembeli dahulu.');return}
+ if(!m||!Number.isInteger(qty)||qty<1||qty>9999){toast('Masukkan jumlah pesanan yang valid.');return}
+ c.orders[m.id]=(Number(c.orders[m.id])||0)+qty;save();render();$('buyerSelect').value=c.id;$('qtyInput').value=1;toast('Pesanan '+m.name+' ditambahkan.');
+});
+$('customers').addEventListener('click',e=>{
+ const b=e.target.closest('button[data-action]');if(!b)return;
+ const c=customers.find(x=>x.id===b.dataset.customer);if(!c)return;
+ if(b.dataset.action==='toggle-details'){
+  if(collapsedCustomers.has(c.id))collapsedCustomers.delete(c.id);else collapsedCustomers.add(c.id);
+  const details=document.getElementById('details-'+c.id);details.hidden=collapsedCustomers.has(c.id);
+  b.setAttribute('aria-expanded',String(!details.hidden));b.textContent=details.hidden?'Lihat rincian':'Ringkas';
+ }else if(b.dataset.action==='remove-customer'){
+  if(confirm('Hapus pembeli "'+c.name+'" beserta seluruh pesanannya?')){customers=customers.filter(x=>x.id!==c.id);save();render();toast('Pembeli dihapus.')}
+ }else if(b.dataset.action==='remove-item'){
+  const m=menuById(b.dataset.menu);if(!m)return;
+  if(confirm('Hapus semua pesanan "'+m.name+'" dari '+c.name+'?')){delete c.orders[m.id];save();render();toast('Item pesanan dihapus.')}
+ }
+});
+$('collapseAllBtn').addEventListener('click',()=>{customers.forEach(c=>collapsedCustomers.add(c.id));render()});
+$('expandAllBtn').addEventListener('click',()=>{collapsedCustomers.clear();render()});
+$('clearBtn').addEventListener('click',()=>{
+ if(!customers.length){toast('Belum ada data untuk dihapus.');return}
+ if(confirm('Yakin ingin menghapus SEMUA pembeli dan pesanan? Unduh CSV terlebih dahulu jika ingin menyimpan salinan.')){customers=[];save();render();toast('Semua data telah dihapus.')}
+});
+$('printBtn').addEventListener('click',()=>window.print());
+function csvCell(v){return '"'+String(v??'').replace(/"/g,'""')+'"'}
+$('exportCsvBtn').addEventListener('click',()=>{
+ const rows=[['REKAP PESANAN MAMA'],['Nama pembeli','Menu','Harga satuan','Jumlah','Subtotal']];
+ customers.forEach(c=>{const entries=Object.entries(c.orders).filter(([id,q])=>menuById(id)&&Number(q)>0);if(!entries.length)rows.push([c.name,'Belum ada pesanan','','','']);else entries.forEach(([id,q])=>{const m=menuById(id);rows.push([c.name,m.name,m.price,q,m.price*Number(q)])});rows.push([c.name,'TOTAL PEMBELI','','',customerTotal(c)])});
+ const t=totals();rows.push([]);rows.push(['REKAP KESELURUHAN']);rows.push(['Menu','Harga satuan','Jumlah','Total']);MENU.filter(m=>!m.legacy||t.qty[m.id]>0).forEach(m=>rows.push([m.name,m.price,t.qty[m.id],m.price*t.qty[m.id]]));rows.push(['TOTAL PENDAPATAN','','',t.revenue]);rows.push(['TOTAL ITEM','','',t.count]);
+ const csv='\uFEFF'+rows.map(r=>r.map(csvCell).join(';')).join('\r\n');
+ const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='rekap-pesanan-mama.csv';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast('File CSV berhasil disiapkan.');
+});
+load();render();
+})();
+</script>
+</body>
+</html>
